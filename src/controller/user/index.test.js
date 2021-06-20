@@ -21,16 +21,27 @@ describe('User Controller', () => {
     password: 'renal123'
   }
   
-  const user = {
+  const userResponse = {
     id: '123',
     email: 'renal.test@gmail.com',
     role: 'admin'
   }
   
+  const user = {
+    id: '123',
+    email: 'renal.test@gmail.com',
+    role: 'admin',
+    password: 'Renal1234556'
+  }
+  
   const signUpResponse = {
     message: 'Success to Create Account!',
-    data: user
+    data: userResponse
   }
+  
+  const userPromiseResponse = new Promise(res => {
+    res(user)
+  })
   
   const userPromise = new Promise(res => {
     res(user)
@@ -41,7 +52,7 @@ describe('User Controller', () => {
   })
   
   it('should success sign up with role admin', done => {
-    sinon.stub(User, 'create').returns(userPromise);
+    sinon.stub(User, 'create').returns(userPromiseResponse);
     User.create(user);
      
     chai.request(app)
@@ -73,9 +84,9 @@ describe('User Controller', () => {
   
   it('success login', done => {
     sinon.stub(User, 'findOne').returns(userPromise);
-    User.findOne({email: userValidRequest.email, isLogin: false});
+    User.findOne({email: userValidRequest.email});
     
-    sinon.stub(bcryptjs, "compareSync").returns(true);
+    sinon.stub(bcryptjs, "compare").returns(new Promise(res => res(true)));
     bcryptjs.compareSync(userValidRequest.password, userValidRequest.password)
     
     sinon.stub(User, 'updateOne').returns(new Promise((res) => {

@@ -4,12 +4,14 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const mongoose = require('mongoose');
+const exceptionHandler = require('./src/controller/exceptionHandler/index');
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 
 var indexRouter = require('./src/routes/index');
 var usersRouter = require('./src/routes/user');
+
 
 const port = process.env.PORT || 3000;
 
@@ -31,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use(exceptionHandler)
 app.listen(port, () => {
   console.log(`listening on port: ${port}`)
 })

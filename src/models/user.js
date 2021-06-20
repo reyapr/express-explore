@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcryptjs = require('bcryptjs');
-const { isEmailValid, isPasswordValid } = require('../helpers/common');
+const { isEmailValid, isPasswordValid } = require('../libraries/common');
 
 const schema = new mongoose.Schema({
   role: {
@@ -18,11 +18,7 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
     validate: [isPasswordValid, 'invalid password']
-  },
-  isLogin: {
-    type: Boolean,
-    default: false
-  } 
+  }
 },{
   timestamps: true
 })

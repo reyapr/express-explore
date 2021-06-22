@@ -1,10 +1,9 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const sinon = require('sinon')
-const userController = require('./index');
-const User = require('../../models/user');
+const userService = require('../../service/user/index');
 const app = require('../../../app')
-const bcryptjs = require('bcryptjs');
+const { BusinessLogicException } = require('../../libraries/exception')
 
 const expect = chai.expect;
 chai.use(chaiHttp);
@@ -43,6 +42,13 @@ describe('User Controller', () => {
     res(user)
   })
   
+  const userRejectPromise = new Promise((resolve, reject) => {
+    reject(new BusinessLogicException({
+      status: 400,
+      message: 'Your password minimum eight characters, at least one letter and one number'
+    }))
+  })
+  
   const userPromise = new Promise(res => {
     res(user)
   })
@@ -52,8 +58,8 @@ describe('User Controller', () => {
   })
   
   it('should success sign up with role admin', done => {
-    sinon.stub(User, 'create').returns(userPromiseResponse);
-    User.create(user);
+    sinon.stub(userService, 'signUp').returns(userPromiseResponse);
+    userService.signUp(user);
      
     chai.request(app)
       .post('/users/signUp')
@@ -70,6 +76,9 @@ describe('User Controller', () => {
   })
   
   it('should failed sign up caused by invalid password input', done => {
+    sinon.stub(userService, 'signUp').returns(userRejectPromise);
+    userService.signUp(user);
+    
     chai.request(app)
       .post('/users/signUp')
       .send(userInvalidRequest)
@@ -81,18 +90,10 @@ describe('User Controller', () => {
       })
     
   })
-  
+
   it('success login', done => {
-    sinon.stub(User, 'findOne').returns(userPromise);
-    User.findOne({email: userValidRequest.email});
-    
-    sinon.stub(bcryptjs, "compare").returns(new Promise(res => res(true)));
-    bcryptjs.compareSync(userValidRequest.password, userValidRequest.password)
-    
-    sinon.stub(User, 'updateOne').returns(new Promise((res) => {
-      res(null);
-    }));
-    User.updateOne({_id: user.id});
+    sinon.stub(userService, 'signIn').returns(userPromise);
+    userService.signIn({email: userValidRequest.email});
     
     chai.request(app)
       .post('/users/signIn')
@@ -106,4 +107,5 @@ describe('User Controller', () => {
       })
     
   })
+
 })

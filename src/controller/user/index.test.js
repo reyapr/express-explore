@@ -3,7 +3,8 @@ const chaiHttp = require('chai-http');
 const sinon = require('sinon')
 const userService = require('../../service/user/index');
 const app = require('../../../app')
-const { BusinessLogicException } = require('../../libraries/exception')
+const { BusinessLogicException } = require('../../libraries/exception');
+const { USERS, SIGN_UP, SIGN_IN } = require('../../routes/constant/userPath');
 
 const expect = chai.expect;
 chai.use(chaiHttp);
@@ -62,7 +63,7 @@ describe('User Controller', () => {
     userService.signUp(user);
      
     chai.request(app)
-      .post('/users/signUp')
+      .post(`${USERS}${SIGN_UP}`)
       .send(userValidRequest)
       .end((err, res, req) => {
         if(err) throw err;
@@ -80,7 +81,7 @@ describe('User Controller', () => {
     userService.signUp(user);
     
     chai.request(app)
-      .post('/users/signUp')
+      .post(`${USERS}${SIGN_UP}`)
       .send(userInvalidRequest)
       .end((err, res) => {
         if(err) throw err;
@@ -96,7 +97,7 @@ describe('User Controller', () => {
     userService.signIn({email: userValidRequest.email});
     
     chai.request(app)
-      .post('/users/signIn')
+      .post(`${USERS}${SIGN_IN}`)
       .send(userValidRequest)
       .end((err, res) => {
         if(err) throw err;
